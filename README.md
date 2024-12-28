@@ -1,6 +1,6 @@
 # macsign
 
-A general-purpose shell script for signing and notarizing applications on macOS.
+A general-purpose shell script for signing and notarising applications on macOS.
 
 ## Overview
 
@@ -8,7 +8,7 @@ Signing macOS applications is difficult without Xcode, and documentation is
 hard to find. This script provides an easy method for projects which use
 alternative build tools, such as CMake or Cargo.
 
-Currently, this script only signs and notarizes standalone `.app` bundles. It
+Currently, this script only signs and notarises standalone `.app` bundles. It
 does not yet have support for `.dmg` or `.pkg` (this is planned).
 
 It has been successfully tested on 16/12/24 using macOS 14.3, but should work

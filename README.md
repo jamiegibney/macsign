@@ -21,7 +21,7 @@ Note that you will need to be a registered Apple Developer *and* have a
 
 Simply run `macsign.sh` to see the following message:
 
-```shell
+```
 Fatal: received arguments are invalid
 
 Usage:

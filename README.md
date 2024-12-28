@@ -15,7 +15,7 @@ It has been successfully tested on 16/12/24 using macOS 14.3, but should work
 on up to macOS 15.2.
 
 Note that you will need to be a registered Apple Developer *and* have a
-"Developer Application ID" certificate.
+"Developer ID Application" certificate.
 
 ## Usage
 
@@ -35,7 +35,7 @@ Note: use the following command to show Apple codesigning IDs
 
 ## TODO
 
-- [ ] Add details for obtaining a "Developer Application ID" certificate, which
+- [ ] Add details for obtaining a "Developer ID Application" certificate, which
   can be an awkward process
 - [ ] Add a script for generating and signing `.pkg` bundles
 - [ ] Add a script for generating and signing `.dmg` bundles

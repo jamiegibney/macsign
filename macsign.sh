@@ -12,18 +12,18 @@ then
     exit 1
 fi
 
-# We can use this to enforce we're using an absolute path
+# We can use this for absolute paths
 function get_abs_path() {
     echo "$(cd "$(dirname "$1")" && pwd)/$(basename "$1")"
 }
 
-# Bind the arguments provided by the user
+# Bind arguments provided by the user
 FILE_PATH=$(get_abs_path "$1")
 DEV_EMAIL="$2"
 DEV_TEAM_ID="$3"
 APP_PASSWORD="$4"
 
-printf "Attempting to sign $FILE_PATH...\n\n"
+printf "Attempting to sign $FILE_PATH now...\n\n"
 
 # Find the Developer ID Application ID for signing
 SIGNING_ID=$(security find-identity -v -p codesigning | grep "Developer\ ID\ Application" | tail -n 1 | cut -c 6-45)
@@ -33,50 +33,56 @@ codesign --verbose --deep --force --timestamp --options=runtime --sign $SIGNING_
 
 if [ $? -ne 0 ]
 then
-    printf "\nFailed to sign application\n"
+    printf "\nFailed to sign the application: see above for more details\n"
     exit 1
 fi
 
 echo
 
-# Zip the .app file to notarise it
-zip -r -1 notary_build.zip "$FILE_PATH"
+printf "\nSigning successful, temporarily zipping the application before notarisation...\n"
+
+# Zip the .app file for notarisation
+zip -r -1 notary_build.zip "$FILE_PATH" > /dev/null
 
 echo
 
-# Notarise the new .zip file — sensitive information here...
+printf "\nApplication zipped, running the notarisation now...\n"
+
+# Notarise the .zip file
 xcrun notarytool submit notary_build.zip --wait --apple-id $DEV_EMAIL --team-id $DEV_TEAM_ID --password $APP_PASSWORD
 
-if [ $? -ne 0 ]
+NOTARISATION_STATUS=$?
+
+# Remove the zip file after notarising, regardless of whether it succeeded
+rm -rf notary_build.zip
+
+if [ $NOTARISATION_STATUS -ne 0 ]
 then
-    printf "\nFailed to notarize\n"
+    printf "\nApp notarisation failed: see above for more details\n"
     exit 1
 fi
 
-echo
-
-# Remove the temporary notarised zip file
-rm -rf notary_build.zip
+printf "\nNotarisation succeeded, stapling the app now...\n"
 
 # Staple the application
 xcrun stapler staple "$FILE_PATH"
 
 if [ $? -ne 0 ]
 then
-    printf "\nFailed to staple: process unsuccessful\n"
+    printf "\nStapling the application failed: see above for more details\n"
     exit 1
 fi
 
-echo
+printf "\nStapling suceeded, running final verification...\n"
 
 # Verify that everything has been signed & notarised
 spctl -vvv --assess --type exec "$FILE_PATH"
 
 if [ $? -eq 0 ]
 then
-    printf "\nProcess successful\n"
+    printf "\nSigning and notarising finished successfully\n"
     exit 0
 else
-    printf "\nSigning failed\n"
+    printf "\nFinal assessment step failed: see above for details\n"
     exit 1
 fi
